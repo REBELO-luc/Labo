@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Notifications</h1>
+    
+    <div class="notification-container" id="notification-container"></div>
+
+    <input type="text" id="notification-text" placeholder="Tapez le texte de la notification">
+    
+    <button onclick="showNotification('success')">Succès</button>
+    <button onclick="showNotification('error')">Erreur</button>
+    <button onclick="showNotification('info')">Info</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
