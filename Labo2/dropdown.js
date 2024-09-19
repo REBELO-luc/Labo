@@ -1,51 +1,69 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const dropdownSearch = document.getElementById("dropdown-search");
-    const dropdownList = document.getElementById("dropdown-list");
-    const items = dropdownList.getElementsByClassName("dropdown-item");
-    const noResults = document.getElementById("no-results");
-    const clearSearch = document.getElementById("clear-search");
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('dropdown-search');
+    const clearBtn = document.getElementById('clear-search');
+    const dropdownList = document.getElementById('dropdown-list');
+    const noResults = document.getElementById('no-results');
+    const items = document.querySelectorAll('.dropdown-item');
+    const categories = document.querySelectorAll('.dropdown-category');
 
-    // Show all items when dropdown is focused
-    dropdownSearch.addEventListener("focus", function() {
-        filterItems("");
-        dropdownList.style.display = "block";
-    });
+    function updateDisplay(filter) {
+        let matchCount = 0;
+        const hasFilter = filter !== '';
 
-    // Filter items as the user types
-    dropdownSearch.addEventListener("input", function() {
-        const filter = dropdownSearch.value.toLowerCase();
-        filterItems(filter);
-    });
+        clearBtn.style.display = hasFilter ? 'inline' : 'none';
+        dropdownList.style.display = 'block';
 
-    // Hide dropdown when clicking outside
-    document.addEventListener("click", function(e) {
-        if (!dropdownSearch.contains(e.target) && !dropdownList.contains(e.target)) {
-            dropdownList.style.display = "none";
-        }
-    });
+        items.forEach(item => {
+            const isVisible = !hasFilter || item.textContent.toLowerCase().includes(filter);
+            item.style.display = isVisible ? 'block' : 'none';
+            if (isVisible) matchCount++;
+        });
 
-    // Clear the search input
-    clearSearch.addEventListener("click", function() {
-        dropdownSearch.value = "";
-        filterItems("");
-        dropdownList.style.display = "block";
-    });
+        categories.forEach(category => {
+            let hasVisibleItem = false;
+            let nextItem = category.nextElementSibling;
 
-    // Function to filter the dropdown items
-    function filterItems(filter) {
-        let visibleItems = 0;
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const text = item.textContent.toLowerCase();
-            if (text.includes(filter)) {
-                item.style.display = "block";
-                visibleItems++;
-            } else {
-                item.style.display = "none";
+            while (nextItem && nextItem.classList.contains('dropdown-item')) {
+                if (nextItem.style.display === 'block') {
+                    hasVisibleItem = true;
+                    break;
+                }
+                nextItem = nextItem.nextElementSibling;
             }
-        }
 
-        // Show or hide the 'No results' message
-        noResults.style.display = visibleItems === 0 ? "block" : "none";
+            category.style.display = hasVisibleItem ? 'block' : 'none';
+        });
+
+        noResults.style.display = matchCount === 0 && hasFilter ? 'block' : 'none';
     }
+
+    searchInput.addEventListener('click', function () {
+        dropdownList.style.display = 'block';
+        updateDisplay(searchInput.value.toLowerCase());
+    });
+
+    searchInput.addEventListener('input', function () {
+        updateDisplay(searchInput.value.toLowerCase());
+    });
+
+    clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        updateDisplay('');
+        dropdownList.style.display = 'none';
+    });
+
+    items.forEach(item => {
+        item.addEventListener('click', function () {
+            searchInput.value = item.textContent;
+            clearBtn.style.display = 'inline';
+            dropdownList.style.display = 'none';
+            noResults.style.display = 'none';
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!dropdownList.contains(event.target) && event.target !== searchInput) {
+            dropdownList.style.display = 'none';
+        }
+    });
 });
